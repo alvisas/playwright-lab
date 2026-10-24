@@ -43,6 +43,7 @@ npm test              # all projects
 npm run test:e2e      # Chromium only
 npm run test:api      # API project
 npm run test:mobile   # smoke tests on a Pixel 7 viewport
+npm run test:a11y     # axe checks
 npm run test:smoke    # tests tagged @smoke
 npm run test:ui       # Playwright UI mode
 npm run report        # open the last HTML report
@@ -76,14 +77,18 @@ Assertions use Playwright's web-first matchers, so there are no fixed sleeps. CI
 
 Accessibility checks use axe through `src/helpers/a11y.ts`. They run in Chromium only. Two rules that the demo app already fails are disabled, so only new violations fail the check.
 
+Tags (`@smoke`, `@regression`, `@contract`, `@a11y`) keep related cases in the same file while letting you run a subset.
+
 ## Configuration
 
-`src/config.ts` reads the base URLs from environment variables and falls back to the public demo sites. Copy `.env.example` to `.env` to point the suite somewhere else:
+`src/config.ts` reads the base URLs from environment variables and falls back to the public demo sites. Accounts and product names live in `src/data/test-data.ts`, which takes the same overrides. Copy `.env.example` to `.env` to point the suite somewhere else:
 
 ```bash
 E2E_BASE_URL=https://staging.example.com
 API_BASE_URL=https://api.staging.example.com
 ```
+
+The same file accepts `E2E_USERNAME`, `E2E_PASSWORD`, `API_USERNAME` and `API_PASSWORD`.
 
 ## Continuous integration
 
