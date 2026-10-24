@@ -26,4 +26,11 @@ test.describe('Shopping cart', () => {
 
     await expect(page).toHaveURL(/inventory\.html/);
   });
+
+  test('keeps the items after a reload @regression', async ({ cartPage, page }) => {
+    await page.reload();
+
+    await cartPage.expectLoaded();
+    await cartPage.expectItems([PRODUCTS.backpack, PRODUCTS.bikeLight]);
+  });
 });

@@ -27,6 +27,13 @@ test.describe('Checkout', () => {
     await expect(checkoutPage.errorMessage).toContainText('First Name is required');
   });
 
+  test('back from the form returns to the cart @regression', async ({ cartPage, page }) => {
+    await page.goBack();
+
+    await cartPage.expectLoaded();
+    await cartPage.expectItems([PRODUCTS.backpack, PRODUCTS.onesie]);
+  });
+
   test('order total equals subtotal plus tax @regression', async ({ checkoutPage }) => {
     await checkoutPage.fillCustomerInfo(CUSTOMER);
     await checkoutPage.continue();

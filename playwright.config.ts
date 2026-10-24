@@ -43,17 +43,27 @@ export default defineConfig({
       dependencies: ['setup'],
       testIgnore: /tests\/api\//,
     },
+    // Accessibility checks target the DOM, so only Chromium runs them.
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'], storageState: AUTH_FILE },
       dependencies: ['setup'],
       testIgnore: /tests\/api\//,
+      grepInvert: /@a11y/,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'], storageState: AUTH_FILE },
       dependencies: ['setup'],
       testIgnore: /tests\/api\//,
+      grepInvert: /@a11y/,
+    },
+    {
+      name: 'mobile',
+      use: { ...devices['Pixel 7'], storageState: AUTH_FILE },
+      dependencies: ['setup'],
+      testIgnore: /tests\/api\//,
+      grep: /@smoke/,
     },
     // API tests use Playwright's request context, so no browser is involved.
     {

@@ -74,6 +74,41 @@ jobs:
           path: test-results
           retention-days: 7
 
+  mobile:
+    name: E2E / mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests on a mobile viewport
+        run: npx playwright test --project=mobile
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-mobile
+          path: blob-report
+          retention-days: 14
+
+      - name: Upload traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-mobile
+          path: test-results
+          retention-days: 7
+
   api:
     name: API tests
     runs-on: ubuntu-latest
@@ -98,7 +133,7 @@ jobs:
 
   report:
     name: Report
-    needs: [e2e, api]
+    needs: [e2e, mobile, api]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -148,7 +183,7 @@ jobs:
 
   notify:
     name: Slack alert
-    needs: [e2e, api]
+    needs: [e2e, mobile, api]
     if: failure() && github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5

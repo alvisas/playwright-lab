@@ -22,6 +22,13 @@ test.describe('Login', () => {
     await expect(page).toHaveURL('/');
   });
 
+  test('blocks a protected page without a session @regression', async ({ loginPage, page }) => {
+    await page.goto('/inventory.html');
+
+    await loginPage.expectError("You can only access '/inventory.html' when you are logged in");
+    await expect(loginPage.loginButton).toBeVisible();
+  });
+
   for (const testCase of INVALID_LOGIN_CASES) {
     test(`rejects login with ${testCase.name} @regression`, async ({ loginPage }) => {
       await loginPage.login(testCase.username, testCase.password);

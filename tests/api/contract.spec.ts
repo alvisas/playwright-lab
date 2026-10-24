@@ -1,5 +1,4 @@
 import { expect, test } from '../../src/fixtures/test';
-import { buildBooking } from '../../src/data/test-data';
 import {
   AuthTokenSchema,
   BookingIdListSchema,
@@ -15,18 +14,13 @@ test.describe('Booking API contract @contract', () => {
     BookingIdListSchema.parse(await response.json());
   });
 
-  test('created booking matches the schema @regression', async ({ bookingApi }) => {
-    const createResponse = await bookingApi.createBooking(buildBooking());
-    expect(createResponse.status()).toBe(200);
-
-    const created = BookingResponseSchema.parse(await createResponse.json());
+  test('created booking matches the schema @regression', async ({ bookingApi, createBooking }) => {
+    const created = await createBooking();
+    BookingResponseSchema.parse(created);
 
     const getResponse = await bookingApi.getBooking(created.bookingid);
     expect(getResponse.status()).toBe(200);
     BookingResponseSchema.shape.booking.parse(await getResponse.json());
-
-    const token = await bookingApi.getToken();
-    await bookingApi.deleteBooking(created.bookingid, token);
   });
 
   test('auth token matches the schema @regression', async ({ bookingApi }) => {
