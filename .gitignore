@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# test artifacts
+/test-results/
+/blob-report/
+/playwright-report/
+/playwright/.cache/
+/playwright/.auth/
+*.junit.xml
+
+# local env & OS files
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
