@@ -9,10 +9,6 @@ export const CREDENTIALS = {
     username: 'locked_out_user',
     password: 'secret_sauce',
   },
-  invalidPassword: {
-    username: 'standard_user',
-    password: 'wrong_password',
-  },
 } as const;
 
 export const API_CREDENTIALS = {
