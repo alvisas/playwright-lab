@@ -9,6 +9,18 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # The Node types should match the runtime in .nvmrc.
+      - dependency-name: '@types/node'
+        update-types:
+          - version-update:semver-major
+      # TypeScript majors wait for a compatible typescript-eslint release.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
