@@ -1,82 +1,28 @@
 # Playwright Lab
 
 [![Playwright CI](https://github.com/alvisas/playwright-lab/actions/workflows/playwright.yml/badge.svg)](https://github.com/alvisas/playwright-lab/actions/workflows/playwright.yml)
-[![Playwright](https://img.shields.io/badge/Playwright-1.64-2EAD33?logo=playwright&logoColor=white)](https://playwright.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Playwright and TypeScript test suite for two public demo applications: the shopping flow on saucedemo and the booking lifecycle on restful-booker. It is a personal project, so the targets stay public and the suite runs without accounts, API keys or a staging server.
+Playwright and TypeScript test suite for two public demo applications: the shopping flow on saucedemo.com and the booking lifecycle on restful-booker.
 
-Latest report: https://alvisas.github.io/playwright-lab/
+The end-to-end tests cover login, inventory, cart and checkout in Chromium, Firefox and WebKit. The API tests exercise the booking CRUD lifecycle, authentication and error responses. Both targets are free demo services, so the repository runs without credentials, API keys or a staging server.
 
-## Coverage
+The HTML report from the latest run on `main` is published to [GitHub Pages](https://alvisas.github.io/playwright-lab/).
 
-### End-to-end: saucedemo.com
+## What it covers
 
-| Area      | Scenario                                       | Tag           |
-| --------- | ---------------------------------------------- | ------------- |
-| Login     | standard user can sign in                      | `@smoke`      |
-| Login     | locked out user is rejected                    | `@regression` |
-| Login     | empty username, empty password, wrong password | `@regression` |
-| Inventory | six products with the expected names           | `@smoke`      |
-| Inventory | price sorting, low to high                     | `@regression` |
-| Inventory | name sorting, Z to A                           | `@regression` |
-| Inventory | add and remove a product updates the badge     | `@smoke`      |
-| Cart      | selected items stay in the cart                | `@smoke`      |
-| Cart      | removing an item updates the badge             | `@regression` |
-| Cart      | continue shopping returns to the inventory     | `@regression` |
-| Checkout  | complete an order                              | `@smoke`      |
-| Checkout  | first name is required                         | `@regression` |
-| Checkout  | order total equals subtotal plus tax           | `@regression` |
+| Area        | Scenarios                                                                        |
+| ----------- | -------------------------------------------------------------------------------- |
+| Login       | valid login, locked-out user, empty username, empty password, wrong password     |
+| Inventory   | full catalogue, price sorting, name sorting, add and remove                      |
+| Cart        | items persist, badge updates after removal, continue shopping                    |
+| Checkout    | complete order, required first name, subtotal plus tax equals total              |
+| Booking API | health check, id list, create/read/update/delete, invalid token, missing booking |
+| Contracts   | Zod schemas for booking, token and error responses                               |
 
-### API: restful-booker
+A full run is 56 tests: 15 end-to-end scenarios per browser, one login setup, and 10 API tests.
 
-| Scenario                                  | Tag           |
-| ----------------------------------------- | ------------- |
-| Health check on `/ping`                   | `@smoke`      |
-| List booking ids                          | `@smoke`      |
-| Create a booking, read it back, delete it | `@regression` |
-| Update and delete with a valid token      | `@regression` |
-| Update with an invalid token returns 403  | `@regression` |
-| Missing booking returns 404               | `@regression` |
-| Response bodies match the Zod schemas     | `@contract`   |
-
-A full run has 56 tests: 15 E2E scenarios on Chromium, Firefox and WebKit, one authentication setup per browser project, and 10 API tests.
-
-## Structure
-
-```
-.
-├── .github/workflows/playwright.yml
-├── src/
-│   ├── api/booking.api.ts
-│   ├── config.ts
-│   ├── data/test-data.ts
-│   ├── fixtures/test.ts
-│   ├── pages/
-│   │   ├── base.page.ts
-│   │   ├── login.page.ts
-│   │   ├── inventory.page.ts
-│   │   ├── cart.page.ts
-│   │   └── checkout.page.ts
-│   └── schemas/booking.schema.ts
-├── tests/
-│   ├── auth.setup.ts
-│   ├── api/
-│   │   ├── booking.spec.ts
-│   │   └── contract.spec.ts
-│   └── e2e/
-│       ├── login.spec.ts
-│       ├── inventory.spec.ts
-│       ├── cart.spec.ts
-│       └── checkout.spec.ts
-├── playwright.config.ts
-└── package.json
-```
-
-Selectors and page actions are kept in `src/pages`. Shared fixtures, test data and the API client live next to them, so specs in `tests` only describe scenarios and assertions.
-
-## Setup
+## Running locally
 
 Requires Node.js 22 or newer.
 
@@ -85,64 +31,63 @@ git clone https://github.com/alvisas/playwright-lab.git
 cd playwright-lab
 npm install
 npx playwright install
-```
-
-## Commands
-
-| Command               | Description                |
-| --------------------- | -------------------------- |
-| `npm test`            | Run all projects           |
-| `npm run test:e2e`    | E2E on Chromium            |
-| `npm run test:api`    | API tests                  |
-| `npm run test:smoke`  | Tests tagged `@smoke`      |
-| `npm run test:headed` | E2E with a visible browser |
-| `npm run test:ui`     | Playwright UI mode         |
-| `npm run report`      | Open the last HTML report  |
-| `npm run lint`        | ESLint                     |
-| `npm run format`      | Prettier                   |
-| `npm run typecheck`   | TypeScript check           |
-
-## Authentication
-
-`tests/auth.setup.ts` signs in once per browser project and saves the session to `playwright/.auth/standard-user.json`, which is not committed. The browser projects depend on the setup and reuse the file. The login spec opts out with `test.use({ storageState: { cookies: [], origins: [] } })` because those tests need a clean browser.
-
-The setup project runs on Chromium by default, so every CI browser job installs Chromium as well.
-
-## Configuration
-
-`src/config.ts` reads the base URLs from environment variables and falls back to the public demo sites. The demo credentials can be overridden in `src/data/test-data.ts`.
-
-```bash
-E2E_BASE_URL=https://staging.example.com \
-API_BASE_URL=https://api.staging.example.com \
 npm test
 ```
 
-For local overrides, copy `.env.example` to `.env`. It is loaded by `dotenv` in `playwright.config.ts`.
+The scripts I use most:
 
-## CI
+```bash
+npm test              # all projects
+npm run test:e2e      # Chromium only
+npm run test:api      # API project
+npm run test:smoke    # tests tagged @smoke
+npm run test:ui       # Playwright UI mode
+npm run report        # open the last HTML report
+```
 
-The workflow runs on pushes to `main`, pull requests, manual triggers and a nightly schedule.
+`npm run lint`, `npm run format:check` and `npm run typecheck` are the checks CI runs on every push.
 
-| Job                             | Description                                                                               |
-| ------------------------------- | ----------------------------------------------------------------------------------------- |
-| Lint & types                    | ESLint, Prettier check and `tsc --noEmit`                                                 |
-| E2E / chromium, firefox, webkit | Installs the browser, runs the E2E project, uploads a blob report and, on failure, traces |
-| API tests                       | Runs the API project                                                                      |
-| Report                          | Merges blob reports and publishes the HTML report                                         |
-| Slack alert                     | Sends a message when the nightly run fails and a webhook secret is configured             |
+## How the suite is organised
 
-The report job deploys to GitHub Pages for `main`. To enable it in a fork:
+```
+src/
+  api/        request client for restful-booker
+  data/       credentials, product names, booking factory
+  fixtures/   page objects and API client injected into tests
+  pages/      one page object per screen
+  schemas/    Zod contracts for API responses
+tests/
+  auth.setup.ts   logs in once and saves the session
+  api/            booking lifecycle and contract tests
+  e2e/            login, inventory, cart, checkout
+```
 
-1. Open Settings, then Pages.
-2. Set Build and deployment to GitHub Actions.
-3. Push to `main` and wait for the Report job.
+Specs in `tests` describe scenarios and assertions. Selectors and page actions live in `src/pages`, and specs receive the page objects and the API client as fixtures instead of building them. Locators go through `getByTestId`, which keeps them stable when copy or layout changes.
 
-Slack alerts are optional. Add `SLACK_WEBHOOK_URL` under Settings, Secrets and variables, Actions. Without it the alert job exits successfully.
+`tests/auth.setup.ts` signs in once and writes the storage state to `playwright/.auth/standard-user.json`. The browser projects start from that file, so the login flow runs a single time per run. The login spec opts out with an empty `storageState` because those tests need a clean session.
+
+Assertions use Playwright's web-first matchers, so there are no fixed sleeps. CI retries a failed test twice and keeps the trace, screenshot and video from the first retry.
+
+## Configuration
+
+`src/config.ts` reads the base URLs from environment variables and falls back to the public demo sites. Copy `.env.example` to `.env` to point the suite somewhere else:
+
+```bash
+E2E_BASE_URL=https://staging.example.com
+API_BASE_URL=https://api.staging.example.com
+```
+
+## Continuous integration
+
+Every push to `main` and every pull request runs lint, Prettier check and typecheck in one job, the E2E project in three browser jobs, and the API project in a fourth. Each job uploads a blob report. A final job merges them, publishes the HTML report to GitHub Pages, and keeps traces as artifacts when a job fails. Because the setup project runs on Chromium, every browser job installs Chromium alongside its matrix browser.
+
+A nightly run at 01:00 UTC catches breakage in the demo services when the repository is otherwise idle. If it fails and `SLACK_WEBHOOK_URL` is set as a repository secret, the workflow posts the run URL to Slack. Without the secret the job exits quietly.
+
+To publish the report from a fork, set Pages to deploy from GitHub Actions under Settings, then Pages.
 
 ## Adding a test
 
-Add the missing action to the page object first:
+Page objects own the locators, so a new interaction is one method. Cancelling from the checkout form, for example:
 
 ```ts
 // src/pages/checkout.page.ts
@@ -151,38 +96,21 @@ async cancel(): Promise<void> {
 }
 ```
 
-Then add the scenario to the spec:
+Then the scenario uses it:
 
 ```ts
 // tests/e2e/checkout.spec.ts
 test('cancel returns to the cart @regression', async ({ checkoutPage, page }) => {
   await checkoutPage.cancel();
-
   await expect(page).toHaveURL(/cart\.html/);
 });
 ```
 
-Run it with:
+Run just that test with `npx playwright test tests/e2e/checkout.spec.ts --project=chromium -g "cancel returns"`.
 
-```bash
-npx playwright test tests/e2e/checkout.spec.ts --project=chromium -g "cancel returns"
-```
+## Notes
 
-## Design notes
-
-- Page objects keep selectors out of specs. The shared header and cart badge live in `base.page.ts`.
-- Fixtures provide page objects and the API client, so tests ask only for what they use.
-- Login runs once per browser project instead of before every test.
-- Tags (`@smoke`, `@regression`, `@contract`) allow running a subset without splitting files.
-- API responses are validated with Zod. A status code check alone would not catch a field that changed type.
-- There are no fixed delays. Web-first assertions wait for the application state, and CI records a trace on the first retry.
-
-## Limitations
-
-- Both targets are shared public demo services, so an outage can fail the pipeline without a code change.
-- API tests create and delete their own bookings, but the data lives on a public server.
-- There are no visual or accessibility checks.
-- The suite is small enough that sharding is not needed yet.
+Both targets are public demo services, so an outage can fail the pipeline without a code change. The API tests delete the bookings they create, but the data still lives on a shared server. There are no visual or accessibility checks yet, and the suite is small enough that sharding would add more moving parts than it saves.
 
 ## License
 
