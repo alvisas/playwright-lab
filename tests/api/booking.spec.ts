@@ -40,15 +40,19 @@ test.describe('Booking API', () => {
       additionalneeds: 'Late checkout',
     });
 
-    const updateResponse = await bookingApi.updateBooking(created.bookingid, updated, authToken);
-    expect(updateResponse.status()).toBe(200);
-    expect(await updateResponse.json()).toEqual(updated);
+    await test.step('update the booking', async () => {
+      const response = await bookingApi.updateBooking(created.bookingid, updated, authToken);
+      expect(response.status()).toBe(200);
+      expect(await response.json()).toEqual(updated);
+    });
 
-    const deleteResponse = await bookingApi.deleteBooking(created.bookingid, authToken);
-    expect(deleteResponse.status()).toBe(201);
+    await test.step('delete the booking', async () => {
+      const response = await bookingApi.deleteBooking(created.bookingid, authToken);
+      expect(response.status()).toBe(201);
 
-    const getResponse = await bookingApi.getBooking(created.bookingid);
-    expect(getResponse.status()).toBe(404);
+      const getResponse = await bookingApi.getBooking(created.bookingid);
+      expect(getResponse.status()).toBe(404);
+    });
   });
 
   test('rejects updates with an invalid token @regression', async ({ request, createBooking }) => {

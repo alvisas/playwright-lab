@@ -10,14 +10,19 @@ test.describe('Checkout', () => {
   });
 
   test('customer can complete an order @smoke', async ({ checkoutPage, page }) => {
-    await checkoutPage.fillCustomerInfo(CUSTOMER);
-    await checkoutPage.continue();
+    await test.step('fill in customer details', async () => {
+      await checkoutPage.fillCustomerInfo(CUSTOMER);
+      await checkoutPage.continue();
 
-    await expect(checkoutPage.subtotalLabel).toBeVisible();
-    await checkoutPage.finish();
+      await expect(checkoutPage.subtotalLabel).toBeVisible();
+    });
 
-    await checkoutPage.expectOrderComplete();
-    await expect(page).toHaveURL(/checkout-complete\.html/);
+    await test.step('finish the order', async () => {
+      await checkoutPage.finish();
+
+      await checkoutPage.expectOrderComplete();
+      await expect(page).toHaveURL(/checkout-complete\.html/);
+    });
   });
 
   test('requires the customer first name @regression', async ({ checkoutPage }) => {
