@@ -14,11 +14,7 @@ export default defineConfig({
   expect: { timeout: 7_000 },
 
   reporter: isCI
-    ? [
-        ['list'],
-        ['blob', { outputDir: 'blob-report' }],
-        ['junit', { outputFile: 'test-results/junit.xml' }],
-      ]
+    ? [['list'], ['blob', { outputDir: 'blob-report' }]]
     : [['list'], ['html', { open: 'never' }]],
 
   use: {
