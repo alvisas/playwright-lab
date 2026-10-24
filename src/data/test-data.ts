@@ -15,6 +15,11 @@ export const CREDENTIALS = {
   },
 } as const;
 
+export const API_CREDENTIALS = {
+  username: process.env.API_USERNAME ?? 'admin',
+  password: process.env.API_PASSWORD ?? 'password123',
+} as const;
+
 export const PRODUCTS = {
   backpack: 'Sauce Labs Backpack',
   bikeLight: 'Sauce Labs Bike Light',

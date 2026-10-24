@@ -1,7 +1,7 @@
 import { expect, test as setup } from '@playwright/test';
 import { AUTH_FILE } from '../src/config';
-import { LoginPage } from '../src/pages/login.page';
 import { CREDENTIALS } from '../src/data/test-data';
+import { LoginPage } from '../src/pages/login.page';
 
 setup('authenticate as standard user', async ({ page }) => {
   const loginPage = new LoginPage(page);

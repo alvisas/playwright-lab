@@ -26,7 +26,7 @@ export interface BookingResponse {
 export class BookingApi {
   constructor(
     private readonly request: APIRequestContext,
-    private readonly credentials = { username: 'admin', password: 'password123' },
+    private readonly credentials: { username: string; password: string },
   ) {}
 
   async ping(): Promise<APIResponse> {

@@ -1,7 +1,7 @@
 import { test as base, expect } from '@playwright/test';
 import { BookingApi, type Booking, type BookingResponse } from '../api/booking.api';
 import { API_BASE_URL } from '../config';
-import { buildBooking } from '../data/test-data';
+import { API_CREDENTIALS, buildBooking } from '../data/test-data';
 import { CartPage } from '../pages/cart.page';
 import { CheckoutPage } from '../pages/checkout.page';
 import { InventoryPage } from '../pages/inventory.page';
@@ -51,7 +51,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   },
 
   bookingApi: async ({ request }, use) => {
-    await use(new BookingApi(request));
+    await use(new BookingApi(request, API_CREDENTIALS));
   },
 
   authToken: [
@@ -59,7 +59,7 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       const request = await playwright.request.newContext({ baseURL: API_BASE_URL });
 
       try {
-        await use(await new BookingApi(request).getToken());
+        await use(await new BookingApi(request, API_CREDENTIALS).getToken());
       } finally {
         await request.dispose();
       }

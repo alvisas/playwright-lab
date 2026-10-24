@@ -1,3 +1,4 @@
+import { API_CREDENTIALS } from '../../src/data/test-data';
 import { expect, test } from '../../src/fixtures/test';
 import {
   AuthTokenSchema,
@@ -32,7 +33,7 @@ test.describe('Booking API contract @contract', () => {
 
   test('rejected login matches the error schema @regression', async ({ request }) => {
     const response = await request.post('/auth', {
-      data: { username: 'admin', password: 'wrong-password' },
+      data: { username: API_CREDENTIALS.username, password: 'wrong-password' },
     });
 
     expect(response.status()).toBe(200);
